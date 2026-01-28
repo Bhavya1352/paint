@@ -25,4 +25,4 @@ npm run dev
 ```
 
 ## Live Demo
-https://paint-bhavya1352.vercel.app
+https://paint-app-coral.vercel.app/
