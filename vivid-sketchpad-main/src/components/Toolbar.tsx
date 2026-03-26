@@ -1,4 +1,4 @@
-import { MousePointer2, Pen, Square, Circle, Trash2, Brush, Download, Undo2, Redo2, RotateCcw, Triangle, Star, Heart, Hexagon, Minus, Type, Eraser, PaintBucket, Sparkles, X, Ellipsis, Diamond, Octagon, Pentagon, Zap, Smile, Eye, Move3D, ChevronDown, Menu } from "lucide-react";
+import { MousePointer2, Pen, Square, Circle, Trash2, Brush, Download, Undo2, Redo2, RotateCcw, Triangle, Star, Heart, Hexagon, Minus, Type, Eraser, PaintBucket, Sparkles, X, Ellipsis, Diamond, Octagon, Pentagon, Zap, Smile, Eye, Move3D, ChevronDown, Menu, Wand2, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Slider } from "@/components/ui/slider";
@@ -31,6 +31,8 @@ interface ToolbarProps {
   onBrushTypeChange: (type: BrushType) => void;
   canUndo?: boolean;
   canRedo?: boolean;
+  onAIImageGen: () => void;
+  onClipArt: () => void;
 }
 
 export const Toolbar = ({ 
@@ -42,6 +44,8 @@ export const Toolbar = ({
   onUndo,
   onRedo,
   onEvaluate,
+  onAIImageGen,
+  onClipArt,
   brushWidth, 
   onBrushWidthChange,
   brushType,
@@ -286,6 +290,42 @@ export const Toolbar = ({
             />
             <span className="text-[10px] sm:text-xs font-mono bg-muted px-1 sm:px-1.5 py-0.5 rounded">{brushWidth}px</span>
           </div>
+        </div>
+      </div>
+
+      {/* AI MAGIC Section */}
+      <div className="mb-2 sm:mb-3 pb-2 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center gap-2 mb-1 sm:mb-2">
+          <span className="text-[10px] sm:text-xs font-semibold text-purple-600 dark:text-purple-400">AI MAGIC</span>
+        </div>
+        <div className="flex items-center gap-1 sm:gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onAIImageGen}
+            className="tool-button rounded-lg sm:rounded-xl w-8 h-8 sm:w-10 sm:h-10 hover:bg-purple-100 hover:text-purple-600"
+            title="AI Image Generator"
+          >
+            <Wand2 className="w-3 h-3 sm:w-4 sm:h-4 text-purple-500" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClipArt}
+            className="tool-button rounded-lg sm:rounded-xl w-8 h-8 sm:w-10 sm:h-10 hover:bg-blue-100 hover:text-blue-600"
+            title="Clip-Art Gallery"
+          >
+            <Store className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onEvaluate}
+            className="tool-button rounded-lg sm:rounded-xl w-8 h-8 sm:w-10 sm:h-10 hover:bg-pink-100 hover:text-pink-600"
+            title="AI Art Critic"
+          >
+            <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-pink-500" />
+          </Button>
         </div>
       </div>
 

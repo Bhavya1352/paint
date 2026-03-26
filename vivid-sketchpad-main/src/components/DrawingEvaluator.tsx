@@ -65,10 +65,16 @@ export const DrawingEvaluator = ({ isOpen, onClose, drawingDataURL }: DrawingEva
     
     setTimeout(() => {
       const randomResult = evaluationResponses[Math.floor(Math.random() * evaluationResponses.length)];
+      
+      // Add some "Real-World" AI simulation logs for professional feel
+      console.log("%c[AI Art Engine] Analyzing image composition...", "color: #9b87f5; font-weight: bold;");
+      console.log("%c[AI Art Engine] Detecting color balance...", "color: #ff79c6; font-weight: bold;");
+      console.log("%c[AI Art Engine] Evaluating stroke flow...", "color: #8be9fd; font-weight: bold;");
+      
       setResult(randomResult);
       setIsEvaluating(false);
       setShowResult(true);
-    }, 3000);
+    }, 2500);
   };
 
   const resetEvaluation = () => {

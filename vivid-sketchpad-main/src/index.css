@@ -123,21 +123,39 @@ All colors MUST be HSL.
 
 @layer components {
   .glass-card {
-    @apply bg-card/90 backdrop-blur-xl shadow-lg border border-border/50;
+    @apply backdrop-blur-2xl shadow-2xl border transition-all duration-300;
+    background: linear-gradient(135deg, hsla(0, 0%, 100%, 0.7), hsla(0, 0%, 100%, 0.3));
+    border-color: hsla(0, 0%, 100%, 0.4);
+  }
+
+  .dark .glass-card {
+    background: linear-gradient(135deg, hsla(250, 20%, 15%, 0.8), hsla(250, 20%, 10%, 0.5));
+    border-color: hsla(250, 20%, 95%, 0.05);
   }
 
   .tool-button {
-    @apply transition-all duration-200 hover:scale-105 active:scale-95;
+    @apply transition-all duration-300 hover:scale-110 active:scale-90 flex items-center justify-center;
   }
 
   .tool-button-active {
-    @apply bg-primary text-primary-foreground shadow-glow;
+    @apply bg-primary text-primary-foreground shadow-lg scale-[1.12] ring-2 ring-primary ring-offset-2;
+    box-shadow: 0 0 25px hsla(var(--primary) / 0.5);
   }
 
-  /* Paint App Style Canvas Container */
+  /* Professional Studio Canvas Container */
   .canvas-container {
-    background: repeating-conic-gradient(#f0f0f0 0% 25%, #ffffff 0% 50%) 
-                50% / 20px 20px;
+    background-color: #f3f4f6;
+    background-image: 
+      linear-gradient(rgba(0,0,0,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,.03) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+
+  .dark .canvas-container {
+    background-color: #0f172a;
+    background-image: 
+      linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
   }
 
   /* Crosshair cursor for drawing */

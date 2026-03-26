@@ -7,6 +7,9 @@ import { ZoomControls } from "./ZoomControls";
 import { DarkModeToggle } from "./DarkModeToggle";
 import { KeyboardShortcuts } from "./KeyboardShortcuts";
 import { LoadingSpinner } from "./LoadingSpinner";
+import { AIImageGen } from "./AIImageGen";
+import { DrawingEvaluator } from "./DrawingEvaluator";
+import { ClipArtGallery } from "./ClipArtGallery";
 import { toast } from "sonner";
 
 export type BrushType = "pencil" | "spray";
@@ -23,6 +26,10 @@ export const Canvas = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [zoomLevel, setZoomLevel] = useState(100);
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
+  const [isAIImageGenOpen, setIsAIImageGenOpen] = useState(false);
+  const [isEvaluatorOpen, setIsEvaluatorOpen] = useState(false);
+  const [isClipArtOpen, setIsClipArtOpen] = useState(false);
+  const [canvasDataURL, setCanvasDataURL] = useState("");
 
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -60,11 +67,13 @@ export const Canvas = () => {
 
     setFabricCanvas(canvas);
 
-    // Save initial empty canvas state so we can undo to blank canvas
+    setCanvasSize({ width: canvas.width || 800, height: canvas.height || 600 });
+    
+    // Start with a clean canvas
     const initialState = JSON.stringify(canvas.toJSON());
     setHistory([initialState]);
     setHistoryIndex(0);
-    setCanvasSize({ width: canvas.width || 800, height: canvas.height || 600 });
+
     setIsLoading(false);
 
     // Track mouse position
@@ -78,22 +87,18 @@ export const Canvas = () => {
       setZoomLevel(Math.round((canvas.getZoom() || 1) * 100));
     });
 
-    // Save on drawing
+    // Save to history (but NOT to localStorage)
     canvas.on('path:created', () => {
       setTimeout(() => {
         if (!isUndoRedo.current) {
           const state = JSON.stringify(canvas.toJSON());
-          console.log('Path created, saving to history');
-          setHistory(prev => {
-            // Truncate any redo states and add new state
-            return [...prev, state];
-          });
+          setHistory(prev => [...prev, state]);
           setHistoryIndex(prev => prev + 1);
         }
       }, 100);
     });
 
-    // Save when object is modified (moved, resized, rotated)
+    // Save to history on modification
     canvas.on('object:modified', () => {
       setTimeout(() => {
         if (!isUndoRedo.current) {
@@ -102,6 +107,21 @@ export const Canvas = () => {
           setHistoryIndex(prev => prev + 1);
         }
       }, 100);
+    });
+
+    // Save to history when object is added (shapes/images/etc)
+    canvas.on('object:added', () => {
+      setTimeout(() => {
+        if (!isUndoRedo.current) {
+          const state = JSON.stringify(canvas.toJSON());
+          setHistory(prev => {
+            const lastState = prev[prev.length - 1];
+            if (lastState === state) return prev;
+            return [...prev, state];
+          });
+          setHistoryIndex(prev => prev + 1);
+        }
+      }, 300);
     });
 
     // Mobile touch support
@@ -487,6 +507,7 @@ export const Canvas = () => {
     fabricCanvas.clear();
     fabricCanvas.backgroundColor = "#ffffff";
     fabricCanvas.renderAll();
+    localStorage.removeItem('mini-paint-state'); // Clear local storage
     setTimeout(() => {
       if (!fabricCanvas || isUndoRedo.current) return;
       const state = JSON.stringify(fabricCanvas.toJSON());
@@ -520,7 +541,16 @@ export const Canvas = () => {
   };
 
   const handleEvaluate = () => {
-    toast.info("AI Evaluator coming soon!");
+    if (!fabricCanvas) return;
+    
+    if (fabricCanvas.getObjects().length === 0) {
+      toast.error('Pehle canvas par kuch draw toh karein! 🎨');
+      return;
+    }
+
+    const dataURL = fabricCanvas.toDataURL({ format: 'png' });
+    setCanvasDataURL(dataURL);
+    setIsEvaluatorOpen(true);
   };
 
   useEffect(() => {
@@ -559,6 +589,8 @@ export const Canvas = () => {
           onUndo={handleUndo}
           onRedo={handleRedo}
           onEvaluate={handleEvaluate}
+          onAIImageGen={() => setIsAIImageGenOpen(true)}
+          onClipArt={() => setIsClipArtOpen(true)}
           canUndo={historyIndex > 0}
           canRedo={historyIndex < history.length - 1}
         />
@@ -611,6 +643,24 @@ export const Canvas = () => {
           </div>
         </div>
       </div>
+
+      <AIImageGen 
+        isOpen={isAIImageGenOpen} 
+        onClose={() => setIsAIImageGenOpen(false)} 
+        fabricCanvas={fabricCanvas} 
+      />
+      
+      <DrawingEvaluator 
+        isOpen={isEvaluatorOpen} 
+        onClose={() => setIsEvaluatorOpen(false)} 
+        drawingDataURL={canvasDataURL} 
+      />
+
+      <ClipArtGallery
+        isOpen={isClipArtOpen}
+        onClose={() => setIsClipArtOpen(false)}
+        fabricCanvas={fabricCanvas}
+      />
     </div>
   );
 };
